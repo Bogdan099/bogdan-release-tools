@@ -1,0 +1,20 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install -r requirements.txt || echo 'No external dependencies'",
+    "startCommand": "python3 web_api.py"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "sleepApplication": false,
+    "restartPolicyType": "ON_FAILURE"
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "PYTHON_VERSION": "3.9",
+        "PORT": "8080"
+      }
+    }
+  }
+}

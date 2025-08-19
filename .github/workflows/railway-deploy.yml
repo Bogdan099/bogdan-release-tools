@@ -1,0 +1,44 @@
+name: 🚀 Deploy to Railway
+
+on:
+  push:
+    branches: [main, master, feature/release-automation]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Railway
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || echo "No external dependencies required"
+          
+      - name: ✅ Test version manager
+        run: |
+          python3 version_manager.py get
+          python3 version_manager.py validate 1.0.0
+          echo "✅ Version manager working correctly"
+          
+      - name: 🚄 Deploy to Railway
+        uses: railwayapp/cli@v3
+        with:
+          command: up --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          
+      - name: 📝 Add deployment info
+        run: |
+          echo "## 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully deployed to Railway" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 Version Manager API is now live!" >> $GITHUB_STEP_SUMMARY

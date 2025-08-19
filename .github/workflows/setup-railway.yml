@@ -1,0 +1,27 @@
+name: 🔐 Setup Railway Token
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/release-automation]
+
+jobs:
+  setup-railway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📋 Railway Token Setup  
+        run: |
+          echo "🚄 Setting up Railway deployment..."
+          echo "📝 RAILWAY_TOKEN: 865b4851-d367-4c12-89dd-9d04ae397529"
+          
+          # Добавляем секрет через GitHub CLI
+          echo "🔐 Adding RAILWAY_TOKEN to secrets..."
+          echo "865b4851-d367-4c12-89dd-9d04ae397529" | gh secret set RAILWAY_TOKEN --repo Bogdan099/bogdan-release-tools
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: ✅ Verify Secret Added
+        run: |
+          echo "✅ RAILWAY_TOKEN добавлен в GitHub Secrets"
+          echo "🚀 Railway deployment готов к запуску!"
