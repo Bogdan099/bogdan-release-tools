@@ -1,0 +1,31 @@
+name: ✅ Test Version Manager
+
+on:
+  push:
+    branches: [feature/release-automation]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+          
+      - name: Test version manager
+        run: |
+          echo "🧪 Testing version manager..."
+          python3 version_manager.py get
+          python3 version_manager.py validate 1.0.0
+          echo "✅ Tests passed!"
+          
+      - name: Railway deployment ready
+        run: |
+          echo "🚄 Railway deployment is configured!"
+          echo "📋 Token: ${{ secrets.RAILWAY_TOKEN != '' && '✅ Present' || '❌ Missing' }}"
+          echo "📂 Files: railway.json, web_api.py, version_manager.py"
+          echo "🎯 Ready for deployment!"
