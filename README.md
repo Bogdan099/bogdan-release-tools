@@ -1,408 +1,177 @@
-# 🚀 Release Automation Tools
+# 📦 Version Manager
 
-Полный набор инструментов для автоматизации релизов с поддержкой semantic versioning, автоматической генерации changelog, мержа PR, создания git tags и публикации GitHub releases.
+Инструмент для работы с semantic versioning в Python проектах.
 
-## 📋 Компоненты
+## ✨ Особенности
 
-### 1. Version Manager (`version_manager.py`)
-Управление semantic versioning согласно semver.org:
-- ✅ Инкремент версий (major, minor, patch, prerelease)
-- ✅ Валидация версий
-- ✅ Сравнение версий
-- ✅ Автоматическое определение типа версии по коммитам
-- ✅ Хранение метаданных версий
+- 📊 **Semantic Versioning** - полная поддержка semver.org
+- 🔄 **Bump функциональность** - увеличение major, minor, patch и prerelease версий  
+- ✅ **Валидация** - проверка корректности версий
+- 💾 **Хранение** - сохранение версий в JSON файле с метаданными
+- 🖥️ **CLI интерфейс** - удобное использование из командной строки
+- 🐍 **Программный API** - использование в Python коде
 
-### 2. Changelog Generator (`changelog_generator.py`)
-Автоматическая генерация CHANGELOG.md из git коммитов:
-- ✅ Поддержка conventional commits
-- ✅ Группировка по типам изменений
-- ✅ Генерация release notes для GitHub
-- ✅ Формат Keep a Changelog
-- ✅ Обнаружение breaking changes
+## 🚀 Установка
 
-### 3. PR Merger (`pr_merger.py`)
-Автоматический мерж pull requests после прохождения проверок:
-- ✅ Проверка статуса CI/CD
-- ✅ Валидация ревью
-- ✅ Настраиваемые условия мержа
-- ✅ Поддержка различных методов мержа
-- ✅ Автоматическое удаление веток
+Скачайте `version_manager.py` в ваш проект. Зависимости не требуются - используется только стандартная библиотека Python.
 
-### 4. Tag Creator (`tag_creator.py`)
-Создание и управление git tags:
-- ✅ Lightweight и annotated tags
-- ✅ Подписанные tags (GPG)
-- ✅ Автоматический push в remote
-- ✅ Валидация имен tags
-- ✅ Статистика по tags
+## 📖 Использование
 
-### 5. Release Publisher (`release_publisher.py`)
-Публикация релизов в GitHub:
-- ✅ Создание GitHub releases
-- ✅ Загрузка assets
-- ✅ Автоматическая генерация release notes
-- ✅ Поддержка draft/prerelease
-- ✅ Статистика по релизам
-
-### 6. Release Automation (`release_automation.py`)
-Главный оркестратор всего процесса релиза:
-- ✅ Полный автоматизированный pipeline
-- ✅ Конфигурируемые настройки
-- ✅ Пошаговое выполнение
-- ✅ Обработка ошибок
-- ✅ Статус мониторинг
-
-## 🔧 Установка
-
-1. Клонируйте репозиторий:
-```bash
-git clone https://github.com/your-org/bogdan-release-tools.git
-cd bogdan-release-tools
-```
-
-2. Установите зависимости:
-```bash
-pip install -r requirements.txt
-```
-
-3. Настройте переменные окружения:
-```bash
-export GITHUB_TOKEN="your_github_token"
-```
-
-## ⚙️ Конфигурация
-
-Создайте файл `release_config.json` или используйте автоматическую генерацию:
+### CLI интерфейс
 
 ```bash
-python release_automation.py config --init
+# Получить текущую версию
+python3 version_manager.py get
+
+# Увеличить patch версию (1.0.0 → 1.0.1)
+python3 version_manager.py bump patch
+
+# Увеличить minor версию (1.0.1 → 1.1.0)
+python3 version_manager.py bump minor
+
+# Увеличить major версию (1.1.0 → 2.0.0)
+python3 version_manager.py bump major
+
+# Создать prerelease версию (2.0.0 → 2.0.0-alpha.1)
+python3 version_manager.py bump prerelease
+
+# Создать prerelease с кастомным идентификатором
+python3 version_manager.py bump prerelease --prerelease-id beta
+
+# Валидировать версию
+python3 version_manager.py validate 1.2.3-alpha.1
 ```
 
-Пример конфигурации:
+### Программный API
+
+```python
+from version_manager import get_current_version, bump_version
+
+# Получить текущую версию
+current = get_current_version()
+print(f"Текущая версия: {current}")
+
+# Увеличить версию
+new_patch = bump_version('patch')
+new_minor = bump_version('minor')
+new_major = bump_version('major')
+new_prerelease = bump_version('prerelease', 'beta')
+
+print(f"Patch: {new_patch}")
+print(f"Minor: {new_minor}")  
+print(f"Major: {new_major}")
+print(f"Prerelease: {new_prerelease}")
+```
+
+### Объектно-ориентированный API
+
+```python
+from version_manager import VersionManager
+
+vm = VersionManager('my_version.json')
+
+# Получить текущую версию
+current = vm.get_current_version()
+
+# Увеличить версию  
+new_version = vm.bump_version('minor')
+
+# Валидация
+is_valid = vm._is_valid_semver('1.2.3-alpha.1')
+```
+
+## 📁 Файл версий
+
+Version Manager создает файл `version.json` со следующей структурой:
+
 ```json
 {
-  "version_file": "version.json",
-  "changelog_file": "CHANGELOG.md", 
-  "repo_path": ".",
-  "remote_name": "origin",
-  "repository": "owner/repo",
-  "github_token": "${GITHUB_TOKEN}",
-  "release_settings": {
-    "tag_prefix": "v",
-    "create_tag": true,
-    "push_tag": true,
-    "create_github_release": true,
-    "sign_tags": false,
-    "delete_branch_after_merge": true,
-    "target_branch": "main"
-  },
-  "pr_merge_settings": {
-    "method": "squash",
-    "required_reviews": 1,
-    "required_status_checks": [],
-    "auto_merge_labels": ["ready-to-merge"],
-    "blocked_labels": ["do-not-merge", "wip"],
-    "target_branches": ["main", "master"],
-    "timeout_minutes": 30
-  },
-  "assets": [
-    {
-      "path": "dist/app.zip",
-      "name": "application.zip",
-      "label": "Application Bundle"
-    }
-  ]
+  "version": "1.2.0-beta.1",
+  "updated_at": "2024-01-15T10:30:45.123456Z",
+  "format": "semantic"
 }
 ```
 
-## 🚀 Использование
+## 📋 Semantic Versioning
 
-### Быстрый старт - Полный автоматический релиз
+Поддерживается полный стандарт [semver.org](https://semver.org/):
 
-```bash
-# Автоматический релиз (определение типа версии по коммитам)
-python release_automation.py release auto
+- **MAJOR** версия увеличивается при несовместимых изменениях API
+- **MINOR** версия увеличивается при добавлении функциональности с обратной совместимостью
+- **PATCH** версия увеличивается при исправлении багов с обратной совместимостью
+- **PRERELEASE** версии для предварительных релизов
 
-# Patch релиз
-python release_automation.py release patch
+### Примеры корректных версий:
 
-# Minor релиз с автоматическим мержем PR
-python release_automation.py release minor --auto-merge-prs
+- `1.0.0`
+- `1.2.3`
+- `1.0.0-alpha`
+- `1.0.0-alpha.1`
+- `1.0.0-alpha0.valid`
+- `1.0.0-alpha.0valid`
+- `1.0.0-alpha-a.b-c-somethinglong+metadata`
+- `1.0.0-rc.1+meta`
 
-# Major релиз как prerelease
-python release_automation.py release major --prerelease
-```
+## 🔧 API Reference
 
-### Пошаговое использование отдельных компонентов
+### Функции
 
-#### Version Manager
-```bash
-# Показать текущую версию
-python version_manager.py --get
+#### `get_current_version() -> str`
+Возвращает текущую версию проекта из файла версий.
 
-# Инкремент версии
-python version_manager.py --increment patch
-python version_manager.py --increment minor
-python version_manager.py --increment major
+#### `bump_version(bump_type: str, prerelease_identifier: str = "alpha") -> str`
+Увеличивает версию согласно типу инкремента.
 
-# Установить конкретную версию
-python version_manager.py --set 1.0.0
+**Параметры:**
+- `bump_type`: Тип инкремента - 'major', 'minor', 'patch', 'prerelease'
+- `prerelease_identifier`: Идентификатор для prerelease версий (по умолчанию 'alpha')
 
-# Валидация версии
-python version_manager.py --validate 1.2.3-beta.1
-```
+**Возвращает:**
+- Новую версию в формате string
 
-#### Changelog Generator
-```bash
-# Обновить CHANGELOG для новой версии
-python changelog_generator.py --version 1.2.0
+### Класс VersionManager
 
-# Генерация с конкретного тега
-python changelog_generator.py --version 1.2.0 --since-tag v1.1.0
+#### `__init__(version_file: str = "version.json")`
+Создает экземпляр менеджера версий.
 
-# Генерация release notes
-python changelog_generator.py --version 1.2.0 --release-notes
-```
+#### `get_current_version() -> str`
+Получает текущую версию из файла.
 
-#### PR Merger
-```bash
-# Проверить статус конкретного PR
-python pr_merger.py --repository owner/repo --status 123
+#### `bump_version(bump_type: str, prerelease_identifier: str = "alpha") -> str`
+Увеличивает версию согласно типу.
 
-# Мерж конкретного PR
-python pr_merger.py --repository owner/repo --pr 123
+## 🛠️ Разработка
 
-# Ожидание и мерж после прохождения проверок
-python pr_merger.py --repository owner/repo --pr 123 --wait
-
-# Автоматический мерж всех готовых PR
-python pr_merger.py --repository owner/repo --auto-merge
-```
-
-#### Tag Creator
-```bash
-# Создать версионный тег
-python tag_creator.py version 1.2.0 --sign --push
-
-# Создать релизный тег с changelog
-python tag_creator.py release 1.2.0 --changelog "Major improvements"
-
-# Список тегов
-python tag_creator.py list --info
-
-# Статистика по тегам
-python tag_creator.py stats
-```
-
-#### Release Publisher
-```bash
-# Создать релиз из тега
-python release_publisher.py create v1.2.0 --body "Release notes here"
-
-# Создать релиз с assets
-python release_publisher.py create v1.2.0 --assets dist/app.zip docs.pdf
-
-# Список релизов
-python release_publisher.py list --count 5
-
-# Статистика по релизам
-python release_publisher.py stats
-```
-
-### Подготовка к релизу
+### Тестирование
 
 ```bash
-# Проверить готовность репозитория
-python release_automation.py status
-
-# Подготовить релиз (мерж PR)
-python release_automation.py prepare
-
-# Проверить конкретный PR
-python release_automation.py prepare --pr 123
+# Базовое тестирование функциональности
+python3 version_manager.py get
+python3 version_manager.py bump patch
+python3 version_manager.py validate 1.0.0
 ```
 
-## 📊 Мониторинг и статистика
+### Расширение
 
-```bash
-# Полный статус системы
-python release_automation.py status
+Version Manager использует только стандартную библиотеку Python и легко расширяется:
 
-# Статистика по версиям
-python version_manager.py --get
+- Добавьте новые форматы хранения версий
+- Интегрируйте с системами CI/CD
+- Добавьте поддержку других систем версионирования
+- Создайте плагины для популярных инструментов
 
-# Статистика по тегам
-python tag_creator.py stats
+## 📄 Лицензия
 
-# Статистика по релизам
-python release_publisher.py stats
-```
+MIT License - см. файл [LICENSE](LICENSE) для деталей.
 
-## 🔄 CI/CD Интеграция
+## 🤝 Поддержка
 
-### GitHub Actions Example
+Если у вас есть вопросы или предложения:
 
-```yaml
-name: Release Automation
+1. Создайте issue в репозитории
+2. Опишите проблему подробно
+3. Приложите примеры использования
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    types: [labeled]
+---
 
-jobs:
-  auto-merge:
-    if: contains(github.event.pull_request.labels.*.name, 'ready-to-merge')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Auto-merge PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python pr_merger.py --repository ${{ github.repository }} --pr ${{ github.event.number }}
-
-  release:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Create Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python release_automation.py release auto
-```
-
-## 🛠️ Расширенные функции
-
-### Conventional Commits
-Система поддерживает conventional commits для автоматического определения типа версии:
-
-- `feat:` → minor increment
-- `fix:` → patch increment
-- `BREAKING CHANGE:` → major increment
-- `docs:`, `style:`, `refactor:`, `test:`, `chore:` → организация в changelog
-
-### Настройка PR мержа
-
-```python
-# В release_config.json
-{
-  "pr_merge_settings": {
-    "method": "squash",  # merge, squash, rebase
-    "required_reviews": 2,
-    "required_status_checks": ["ci", "tests", "security-scan"],
-    "auto_merge_labels": ["ready-to-merge", "hotfix"],
-    "blocked_labels": ["do-not-merge", "wip", "needs-review"],
-    "target_branches": ["main", "develop"],
-    "timeout_minutes": 60,
-    "dismiss_stale_reviews": true,
-    "require_up_to_date": true
-  }
-}
-```
-
-### Подписание тегов и релизов
-
-```bash
-# Настройка GPG для подписания
-git config user.signingkey YOUR_GPG_KEY_ID
-git config commit.gpgsign true
-git config tag.gpgsign true
-
-# Создание подписанного релиза
-python tag_creator.py release 1.0.0 --no-push --sign
-```
-
-## 🧪 Тестирование
-
-```bash
-# Установка dev-зависимостей
-pip install pytest pytest-cov
-
-# Запуск тестов
-pytest tests/
-
-# С покрытием кода
-pytest --cov=. tests/
-```
-
-## 📚 API Reference
-
-### Version Manager API
-```python
-from version_manager import VersionManager, VersionType
-
-vm = VersionManager()
-current = vm.get_current_version()
-new_version = vm.increment_version(VersionType.MINOR)
-```
-
-### Changelog Generator API
-```python
-from changelog_generator import ChangelogGenerator
-
-cg = ChangelogGenerator()
-commits = cg.get_git_commits(since_tag="v1.0.0")
-cg.update_changelog("1.1.0", commits)
-```
-
-### Release Publisher API
-```python
-from release_publisher import ReleasePublisher, Release, ReleaseAsset
-
-rp = ReleasePublisher(token, "owner/repo")
-release = Release(
-    tag_name="v1.0.0",
-    name="Release 1.0.0",
-    body="Release notes",
-    assets=[ReleaseAsset("dist/app.zip")]
-)
-result = rp.create_release(release)
-```
-
-## 🤝 Contributing
-
-1. Fork репозиторий
-2. Создайте feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit изменения (`git commit -m 'Add amazing feature'`)
-4. Push в branch (`git push origin feature/amazing-feature`)
-5. Откройте Pull Request
-
-## 📄 License
-
-Этот проект лицензируется под MIT License - см. файл [LICENSE](LICENSE) для деталей.
-
-## 🆘 Поддержка
-
-Если у вас есть вопросы или проблемы:
-
-1. Проверьте [Issues](https://github.com/your-org/bogdan-release-tools/issues)
-2. Создайте новый issue с подробным описанием
-3. Используйте labels для категоризации
-
-## 📈 Roadmap
-
-- [ ] Поддержка multiple repositories
-- [ ] Webhook интеграции
-- [ ] Slack/Teams notifications
-- [ ] Release approval workflow
-- [ ] Custom release templates
-- [ ] Docker container deployment
-- [ ] Rollback functionality
+**Version Manager** - надежный инструмент для работы с semantic versioning в ваших Python проектах! 🚀
